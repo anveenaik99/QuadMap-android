@@ -2,15 +2,11 @@ package ash.quadmap_android;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.IBinder;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.util.concurrent.ExecutionException;
@@ -34,8 +29,6 @@ public class ConnectScreen extends AppCompatActivity {
     BufferedWriter b = null;
     String host;
     int port;
-    Client c;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,32 +53,18 @@ public class ConnectScreen extends AppCompatActivity {
         Intent i = new Intent(this,GPSProvider.class);
         startService(i);
     }
-    ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Client.MyBinder binder = (Client.MyBinder)
-            c =
-            Toast.makeText(ConnectScreen.this, "Service Connected", Toast.LENGTH_SHORT).show();
-        }
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    };
     private void enableButton(){
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 host = IP.getText().toString();
                 port = Integer.parseInt(Port.getText().toString());
-                Intent i = new Intent(ConnectScreen.this,Client.class);
-                bindService(i,mConnection,BIND_AUTO_CREATE);
+                Client c = new Client(getApplicationContext(),
+                        host,
+                        port);
                 try{
-
-                    Intent map = new Intent(ConnectScreen.this,MapsActivity.class);
-                    map.putExtra("Client", (Parcelable) b);
-
+                    b = c.execute().get();
                 }catch (InterruptedException | ExecutionException e){
                     e.printStackTrace();
                 }
