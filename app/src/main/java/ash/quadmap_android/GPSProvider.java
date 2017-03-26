@@ -17,7 +17,7 @@ public class GPSProvider extends Service {
     public static final int PER_SEC = 1000;
     private LocationManager locationManager = null;
     private LocationListener listener;
-
+    final static  String CONNECT = "CONNECT";
     public GPSProvider() {
     }
 
@@ -28,6 +28,7 @@ public class GPSProvider extends Service {
             @Override
             public void onLocationChanged(Location location) {
                 Intent i = new Intent("location_update");
+                i.setAction(CONNECT);
                 i.putExtra("coordinates", location.getLatitude() +
                         "," +
                         location.getLongitude());
