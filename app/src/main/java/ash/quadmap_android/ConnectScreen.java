@@ -63,8 +63,8 @@ public class ConnectScreen extends AppCompatActivity {
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Client.MyBinder binder = (Client.MyBinder)iBinder;
-            c = binder.getService();
+            Client.MyBinder binder = (Client.MyBinder)
+            c =
             Toast.makeText(ConnectScreen.this, "Service Connected", Toast.LENGTH_SHORT).show();
         }
 
@@ -81,9 +81,14 @@ public class ConnectScreen extends AppCompatActivity {
                 port = Integer.parseInt(Port.getText().toString());
                 Intent i = new Intent(ConnectScreen.this,Client.class);
                 bindService(i,mConnection,BIND_AUTO_CREATE);
-                BufferedWriter b = c.getWriter();
-                Intent map = new Intent(ConnectScreen.this,MapsActivity.class);
-                startActivity(map);
+                try{
+
+                    Intent map = new Intent(ConnectScreen.this,MapsActivity.class);
+                    map.putExtra("Client", (Parcelable) b);
+
+                }catch (InterruptedException | ExecutionException e){
+                    e.printStackTrace();
+                }
             }
         });
     }
