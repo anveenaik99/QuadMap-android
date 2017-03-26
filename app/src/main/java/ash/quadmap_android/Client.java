@@ -33,7 +33,7 @@ public class Client extends AsyncTask<Void,Void,BufferedWriter>{
             bw = new BufferedWriter(out);
             Log.d("Client", "Successfully Executed");
         }catch (IOException ignored) {
-
+            Log.e("ClientError","Can't Connect");
         }
         return bw;
     }

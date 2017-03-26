@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -49,7 +51,6 @@ public class ConnectScreen extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(GPSProvider.CONNECT);
         registerReceiver(myReciever,intentFilter);
-
         Intent i = new Intent(this,GPSProvider.class);
         startService(i);
     }
@@ -66,8 +67,11 @@ public class ConnectScreen extends AppCompatActivity {
                 try{
                     b = c.execute().get();
                 }catch (InterruptedException | ExecutionException e){
-                    e.printStackTrace();
+                    Log.e("Page","Not Connecting");
                 }
+                Intent map = new Intent(ConnectScreen.this,Interface.class);
+                map.putExtra("Writer", (Parcelable) b);
+                startActivity(map);
             }
         });
     }
