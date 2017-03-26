@@ -29,9 +29,9 @@ public class GPSProvider extends Service {
             public void onLocationChanged(Location location) {
                 Intent i = new Intent("location_update");
                 i.setAction(CONNECT);
-                i.putExtra("coordinates", location.getLatitude() +
+                i.putExtra("coordinates", Double.toString(location.getLatitude()) +
                         "," +
-                        location.getLongitude());
+                        Double.toString(location.getLongitude()));
                 sendBroadcast(i);
             }
 

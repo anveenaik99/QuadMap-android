@@ -13,20 +13,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+
+import java.io.BufferedWriter;
+import java.util.concurrent.ExecutionException;
 
 public class ConnectScreen extends AppCompatActivity {
 
     MyReciever myReciever;
     private Button connect;
-    TextView port;
+    EditText Port;
+    EditText IP;
+    String GPSData;
+    BufferedWriter b = null;
+    String host;
+    int port;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect_screen);
 
         connect = (Button)findViewById(R.id.connect_btn);
-        port = (TextView) findViewById(R.id.Port_text);
+        Port = (EditText) findViewById(R.id.Port);
+        IP = (EditText) findViewById(R.id.IP);
         if(!runtime_permissions()){
             enableButton();
         }
@@ -48,9 +58,17 @@ public class ConnectScreen extends AppCompatActivity {
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                host = IP.getText().toString();
+                port = Integer.parseInt(Port.getText().toString());
+                Client c = new Client(getApplicationContext(),
+                                    host,
+                                    port);
+                try{
+                    b = c.execute().get();
+                }catch (InterruptedException | ExecutionException e){
+                    e.printStackTrace();
+                }
             }
-
         });
     }
     private boolean runtime_permissions() {
@@ -78,8 +96,7 @@ public class ConnectScreen extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String coordinates = (String) intent.getExtras().get("coordinates");
-            port.setText(coordinates);
+            GPSData = (String) intent.getExtras().get("coordinates");
         }
     }
 }
