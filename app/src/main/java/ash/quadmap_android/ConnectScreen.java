@@ -96,7 +96,7 @@ public class ConnectScreen extends AppCompatActivity {
         }
     }
 
-    private class MyReciever extends BroadcastReceiver{
+    class MyReciever extends BroadcastReceiver{
 
         @Override
         public void onReceive(Context context, Intent intent) {
