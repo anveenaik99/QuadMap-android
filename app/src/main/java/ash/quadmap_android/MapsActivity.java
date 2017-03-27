@@ -159,6 +159,11 @@ public class MapsActivity extends Fragment implements
     @Override
     public boolean onMarkerClick(Marker marker) {
         Log.i("Marker","Click Marker");
+        Snackbar snack = Snackbar.make(getView(),marker.getPosition().latitude +
+                                                "," +
+                                                marker.getPosition().longitude,Snackbar.LENGTH_LONG);
+        snack.show();
+        marker.showInfoWindow();
         return true;
     }
 
