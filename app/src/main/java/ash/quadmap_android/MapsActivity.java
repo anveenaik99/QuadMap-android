@@ -1,6 +1,7 @@
 package ash.quadmap_android;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.icu.util.TimeUnit;
 import android.location.Location;

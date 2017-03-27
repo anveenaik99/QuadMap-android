@@ -1,5 +1,6 @@
 package ash.quadmap_android;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -47,5 +48,12 @@ public class Interface extends AppCompatActivity {
         Toast.makeText(this, "Going to next Point\n"+location.getLatitude()+","+location.getLongitude(), Toast.LENGTH_SHORT).show();
         if(bw != null)
             bw.write(location.getLatitude()+","+location.getLongitude());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Intent i = new Intent(this,GPSProvider.class);
+        stopService(i);
     }
 }
