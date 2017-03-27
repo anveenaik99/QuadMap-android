@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class Interface extends AppCompatActivity {
 
@@ -24,6 +25,9 @@ public class Interface extends AppCompatActivity {
     private Location[] locations;
     BufferedWriter bw;
     public int mode = 1;
+    String IP;
+    int socket;
+    Client client;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +50,19 @@ public class Interface extends AppCompatActivity {
         });
         getSupportFragmentManager().beginTransaction().replace(R.id.include,new MapsActivity()).commit();
         Bundle bundle = getIntent().getExtras();
-        bw = bundle.getParcelable("Writer");
+        IP = bundle.getString("IP");
+        socket = bundle.getInt("Port");
+        client = new Client(getApplicationContext(),IP,socket);
+        try{
+            bw = client.execute().get();
+            if(bw != null)
+                Toast.makeText(this, "Successfully Connected to Server", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(this, "Failed to connect to Server.\n" +
+                                     "        Try Again !!", Toast.LENGTH_SHORT).show();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -84,10 +100,13 @@ public class Interface extends AppCompatActivity {
                 bw.write("A"+","+location.getLatitude() + "," + location.getLongitude());
         }
         else {
-            for (Location a_location : _location) {
-                bw.write("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
+            Toast.makeText(this, "Writing Array to Server" , Toast.LENGTH_SHORT).show();
+            if(bw != null) {
+                for (Location a_location : _location) {
+                    bw.write("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
+                }
+                bw.write("X");
             }
-            bw.write("X");
         }
     }
 

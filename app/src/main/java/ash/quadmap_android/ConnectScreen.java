@@ -72,20 +72,9 @@ public class ConnectScreen extends AppCompatActivity {
                     Toast.makeText(ConnectScreen.this, "Enter valid IP and Port", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Client c = new Client(getApplicationContext(),
-                            host,
-                            port);
                     Intent map = new Intent(ConnectScreen.this, Interface.class);
-                    try {
-                        b = c.execute().get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        Log.e("Page", "Not Connecting");
-                        Toast.makeText(ConnectScreen.this, "Starting without Connection\n Try Again !!", Toast.LENGTH_SHORT).show();
-                    }
-
-                    if(b != null){
-                        map.putExtra("Writer", (Parcelable) b);
-                    }
+                    map.putExtra("IP",host);
+                    map.putExtra("Port",port);
                     startActivity(map);
                 }
             }

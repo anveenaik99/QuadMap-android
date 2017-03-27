@@ -190,17 +190,18 @@ public class MapsActivity extends Fragment implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if(lastOpened != null){
-            mMap.clear();
-            lastOpened = null;
+        if(((Interface)getActivity()).getMode() == 1) {
+            Log.i("Marker", "Click Marker");
+            lastOpened = marker;
+            Snackbar snack = Snackbar.make(getView(), lastOpened.getPosition().latitude +
+                    "," +
+                    lastOpened.getPosition().longitude, Snackbar.LENGTH_LONG);
+            lastOpened.showInfoWindow();
+            snack.show();
         }
-        Log.i("Marker","Click Marker");
-        lastOpened = marker;
-        Snackbar snack = Snackbar.make(getView(),lastOpened.getPosition().latitude +
-                                                "," +
-                                                lastOpened.getPosition().longitude,Snackbar.LENGTH_LONG);
-        lastOpened.showInfoWindow();
-        snack.show();
+        else{
+            marker.showInfoWindow();
+        }
         return true;
     }
 
@@ -217,6 +218,7 @@ public class MapsActivity extends Fragment implements
                 e.printStackTrace();
             }
             Log.i("Info", "Info Marker");
+            mMap.clear();
         }
         else{
             List<Location> points = new ArrayList<>();
@@ -229,6 +231,7 @@ public class MapsActivity extends Fragment implements
             Location[] points_array = (Location[]) points.toArray(new Location[points.size()]);
             try {
                 ((Interface) getActivity()).GotoPoint(points_array);
+                Log.i("Mode 2","Sending Data");
             } catch (IOException e) {
                 e.printStackTrace();
             }
