@@ -92,7 +92,6 @@ public class MapsActivity extends Fragment implements
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
-                        mMap.clear();
                         MarkerOptions options = new MarkerOptions()
                                 .position(latLng)
                                 .title("Tap to send quad");
