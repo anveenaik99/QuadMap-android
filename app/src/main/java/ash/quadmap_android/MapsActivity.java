@@ -48,7 +48,7 @@ public class MapsActivity extends Fragment implements
     GoogleApiClient mGoogleApiClient;
     Location location;
     LocationRequest mLocationRequest;
-
+    Marker lastOpened = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,12 +159,16 @@ public class MapsActivity extends Fragment implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        if(lastOpened != null){
+            lastOpened.hideInfoWindow();
+        }
         Log.i("Marker","Click Marker");
-        Snackbar snack = Snackbar.make(getView(),marker.getPosition().latitude +
+        lastOpened = marker;
+        Snackbar snack = Snackbar.make(getView(),lastOpened.getPosition().latitude +
                                                 "," +
-                                                marker.getPosition().longitude,Snackbar.LENGTH_LONG);
+                                                lastOpened.getPosition().longitude,Snackbar.LENGTH_LONG);
+        lastOpened.showInfoWindow();
         snack.show();
-        marker.showInfoWindow();
         return true;
     }
 
