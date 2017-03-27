@@ -83,7 +83,7 @@ public class MapsActivity extends Fragment implements
                     return;
                 }
                 mMap.setMyLocationEnabled(true);
-                LatLng current = new LatLng(22,87);
+                LatLng current = new LatLng(22.3189734,87.3026368);
                 CameraPosition cameraPosition = new CameraPosition.Builder().target(current).build();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
                 mMap.moveCamera(cameraUpdate);
