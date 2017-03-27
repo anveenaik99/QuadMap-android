@@ -2,4 +2,5 @@
     <string name="app_name">Quad Map-android</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_interface">Interface</string>
+    <string name="action_settings">Settings</string>
 </resources>

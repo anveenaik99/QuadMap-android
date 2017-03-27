@@ -7,14 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import java.io.BufferedWriter;
-
 public class Interface extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        BufferedWriter b;
         setContentView(R.layout.activity_interface);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -27,9 +24,6 @@ public class Interface extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-        Bundle bundle = getIntent().getExtras();
-        b = (BufferedWriter) bundle.getParcelable("Writer");
     }
 
 }
