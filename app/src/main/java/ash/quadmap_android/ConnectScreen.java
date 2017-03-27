@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.util.concurrent.ExecutionException;
@@ -39,6 +40,18 @@ public class ConnectScreen extends AppCompatActivity {
         connect = (Button)findViewById(R.id.connect_btn);
         Port = (EditText) findViewById(R.id.Port);
         IP = (EditText) findViewById(R.id.IP);
+        IP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                IP.setText("");
+            }
+        });
+        Port.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Port.setText("");
+            }
+        });
         if(!runtime_permissions()){
             enableButton();
         }
@@ -61,17 +74,23 @@ public class ConnectScreen extends AppCompatActivity {
             public void onClick(View view) {
                 host = IP.getText().toString();
                 port = Integer.parseInt(Port.getText().toString());
-                Client c = new Client(getApplicationContext(),
-                        host,
-                        port);
-                try{
-                    b = c.execute().get();
-                }catch (InterruptedException | ExecutionException e){
-                    Log.e("Page","Not Connecting");
+                if(host.isEmpty()){
+                    Toast.makeText(ConnectScreen.this, "Enter valid IP and Port", Toast.LENGTH_SHORT).show();
                 }
-                Intent map = new Intent(ConnectScreen.this,Interface.class);
-                map.putExtra("Writer", (Parcelable) b);
-                startActivity(map);
+                else {
+                    Client c = new Client(getApplicationContext(),
+                            host,
+                            port);
+                    try {
+                        b = c.execute().get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        Log.e("Page", "Not Connecting");
+                        Toast.makeText(ConnectScreen.this, "Starting without Connection\n Try Again !!", Toast.LENGTH_SHORT).show();
+                    }
+                    Intent map = new Intent(ConnectScreen.this, Interface.class);
+                    map.putExtra("Writer", (Parcelable) b);
+                    startActivity(map);
+                }
             }
         });
     }
