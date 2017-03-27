@@ -10,6 +10,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -19,7 +21,9 @@ import java.io.IOException;
 public class Interface extends AppCompatActivity {
 
     private Location Home;
+    private Location[] locations;
     BufferedWriter bw;
+    public int mode = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +36,10 @@ public class Interface extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    GotoPoint(Home);
+                    if(mode == 1)
+                        GotoPoint(new Location[]{Home});
+                    else
+                        GotoPoint(locations);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -42,14 +49,45 @@ public class Interface extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         bw = bundle.getParcelable("Writer");
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_interface,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.point_follow){
+
+        }
+        else
+            if(id == R.id.path_follow){
+
+            }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void setHome(Location location){
         Home = location;
         Log.i("Home","Updated current location");
     }
-    public void GotoPoint(Location location) throws IOException {
-        Toast.makeText(this, "Going to next Point\n"+location.getLatitude()+","+location.getLongitude(), Toast.LENGTH_SHORT).show();
-        if(bw != null)
-            bw.write(location.getLatitude()+","+location.getLongitude());
+    public void GotoPoint(Location[] _location) throws IOException {
+        Location location;
+        if(mode == 1) {
+            location = _location[0];
+            Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT).show();
+            if (bw != null)
+                bw.write("A"+","+location.getLatitude() + "," + location.getLongitude());
+        }
+        else {
+            for (Location a_location : _location) {
+                bw.write("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
+            }
+            bw.write("X");
+        }
     }
 
     @Override
@@ -57,5 +95,9 @@ public class Interface extends AppCompatActivity {
         super.onPause();
         Intent i = new Intent(this,GPSProvider.class);
         stopService(i);
+    }
+
+    public int getMode(){
+        return mode;
     }
 }

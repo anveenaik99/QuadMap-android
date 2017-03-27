@@ -3,6 +3,9 @@ package ash.quadmap_android;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.icu.util.TimeUnit;
 import android.location.Location;
 import android.location.LocationManager;
@@ -30,6 +33,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -37,6 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.sql.Time;
+import java.util.List;
 
 public class MapsActivity extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
@@ -50,6 +56,8 @@ public class MapsActivity extends Fragment implements
     Location location;
     LocationRequest mLocationRequest;
     Marker lastOpened = null;
+    List<LatLng> locations;
+    int point_no = 0;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,11 +101,22 @@ public class MapsActivity extends Fragment implements
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
-                        mMap.clear();
-                        MarkerOptions options = new MarkerOptions()
-                                .position(latLng)
-                                .title("Tap to send quad");
-                        mMap.addMarker(options);
+                        if(((Interface)getActivity()).getMode() == 1) {
+                            mMap.clear();
+                            MarkerOptions options = new MarkerOptions()
+                                    .position(latLng)
+                                    .title("Tap to send quad");
+                            mMap.addMarker(options);
+                        }
+                        else{
+                            point_no++;
+                            MarkerOptions options = new MarkerOptions()
+                                    .position(latLng)
+                                    .title("Tap to send to selected waypoints")
+                                    .icon(getTextMarker(Integer.toString(point_no)));
+                            mMap.addMarker(options);
+                            locations.add(latLng);
+                        }
                        // mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
                 });
@@ -175,14 +194,55 @@ public class MapsActivity extends Fragment implements
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Location i = new Location(LocationManager.GPS_PROVIDER);
-        i.setLatitude(marker.getPosition().latitude);
-        i.setLongitude(marker.getPosition().longitude);
-        try {
-            ((Interface)getActivity()).GotoPoint(i);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(((Interface)getActivity()).getMode() == 1) {
+            Location i = new Location(LocationManager.GPS_PROVIDER);
+            i.setLatitude(marker.getPosition().latitude);
+            i.setLongitude(marker.getPosition().longitude);
+            Location point[] = {i};
+            try {
+                ((Interface) getActivity()).GotoPoint(point);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.i("Info", "Info Marker");
         }
-        Log.i("Info","Info Marker");
+        else{
+            List<Location> points = null;
+            for(int i = 0; i < point_no; i++){
+                Location loc = new Location(LocationManager.GPS_PROVIDER);
+                loc.setLatitude((locations.get(i)).latitude);
+                loc.setLongitude((locations.get(i)).longitude);
+                points.add(loc);
+            }
+            Location[] points_array = (Location[]) points.toArray();
+            try {
+                ((Interface) getActivity()).GotoPoint(points_array);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public BitmapDescriptor getTextMarker(String text) {
+
+        Paint paint = new Paint();
+    /* Set text size, color etc. as needed */
+        paint.setTextSize(24);
+
+        int width = (int)paint.measureText(text);
+        int height = (int)paint.getTextSize();
+
+        paint.setTextAlign(Paint.Align.CENTER);
+        // Create a transparent bitmap as big as you need
+        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(image);
+        // During development the following helps to see the full
+        // drawing area:
+        canvas.drawColor(0x50A0A0A0);
+        // Start drawing into the canvas
+        canvas.translate(width / 2f, height);
+        canvas.drawText(text, 0, 0, paint);
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(image);
+        return icon;
     }
 }
