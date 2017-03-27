@@ -42,6 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends Fragment implements
@@ -56,8 +57,18 @@ public class MapsActivity extends Fragment implements
     Location location;
     LocationRequest mLocationRequest;
     Marker lastOpened = null;
-    List<LatLng> locations;
+    List<LatLng> locations = new ArrayList<>();
     int point_no = 0;
+
+    public MapsActivity(){
+
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -180,7 +191,8 @@ public class MapsActivity extends Fragment implements
     @Override
     public boolean onMarkerClick(Marker marker) {
         if(lastOpened != null){
-            lastOpened.hideInfoWindow();
+            mMap.clear();
+            lastOpened = null;
         }
         Log.i("Marker","Click Marker");
         lastOpened = marker;
@@ -207,14 +219,14 @@ public class MapsActivity extends Fragment implements
             Log.i("Info", "Info Marker");
         }
         else{
-            List<Location> points = null;
+            List<Location> points = new ArrayList<>();
             for(int i = 0; i < point_no; i++){
                 Location loc = new Location(LocationManager.GPS_PROVIDER);
                 loc.setLatitude((locations.get(i)).latitude);
                 loc.setLongitude((locations.get(i)).longitude);
                 points.add(loc);
             }
-            Location[] points_array = (Location[]) points.toArray();
+            Location[] points_array = (Location[]) points.toArray(new Location[points.size()]);
             try {
                 ((Interface) getActivity()).GotoPoint(points_array);
             } catch (IOException e) {
@@ -227,7 +239,7 @@ public class MapsActivity extends Fragment implements
 
         Paint paint = new Paint();
     /* Set text size, color etc. as needed */
-        paint.setTextSize(24);
+        paint.setTextSize(80);
 
         int width = (int)paint.measureText(text);
         int height = (int)paint.getTextSize();

@@ -75,14 +75,17 @@ public class ConnectScreen extends AppCompatActivity {
                     Client c = new Client(getApplicationContext(),
                             host,
                             port);
+                    Intent map = new Intent(ConnectScreen.this, Interface.class);
                     try {
                         b = c.execute().get();
                     } catch (InterruptedException | ExecutionException e) {
                         Log.e("Page", "Not Connecting");
                         Toast.makeText(ConnectScreen.this, "Starting without Connection\n Try Again !!", Toast.LENGTH_SHORT).show();
                     }
-                    Intent map = new Intent(ConnectScreen.this, Interface.class);
-                    map.putExtra("Writer", (Parcelable) b);
+
+                    if(b != null){
+                        map.putExtra("Writer", (Parcelable) b);
+                    }
                     startActivity(map);
                 }
             }

@@ -30,7 +30,6 @@ public class Interface extends AppCompatActivity {
         setContentView(R.layout.activity_interface);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Fragment map = new MapsActivity();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +44,7 @@ public class Interface extends AppCompatActivity {
                 }
             }
         });
-        getSupportFragmentManager().beginTransaction().replace(R.id.map,map).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.include,new MapsActivity()).commit();
         Bundle bundle = getIntent().getExtras();
         bw = bundle.getParcelable("Writer");
     }
@@ -61,11 +60,13 @@ public class Interface extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.point_follow){
-
+            mode = 1;
+            Toast.makeText(this, "Switched to Point Follow", Toast.LENGTH_SHORT).show();
         }
         else
             if(id == R.id.path_follow){
-
+                mode = 2;
+                Toast.makeText(this, "Switched to Path Follow", Toast.LENGTH_SHORT).show();
             }
         return super.onOptionsItemSelected(item);
     }
