@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -43,6 +44,7 @@ public class Interface extends AppCompatActivity {
     }
     public void setHome(Location location){
         Home = location;
+        Log.i("Home","Updated current location");
     }
     public void GotoPoint(Location location) throws IOException {
         Toast.makeText(this, "Going to next Point\n"+location.getLatitude()+","+location.getLongitude(), Toast.LENGTH_SHORT).show();
