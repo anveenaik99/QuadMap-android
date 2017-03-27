@@ -135,6 +135,7 @@ public class MapsActivity extends Fragment implements
             return;
         }
         location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        ((Interface)getActivity()).setHome(location);
         if (location == null) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
