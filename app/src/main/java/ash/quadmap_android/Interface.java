@@ -9,12 +9,15 @@ import android.support.v4.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class Interface extends AppCompatActivity {
 
     private Location Home;
+    BufferedWriter bw;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,15 +29,23 @@ public class Interface extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                try {
+                    GotoPoint(Home);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         getSupportFragmentManager().beginTransaction().replace(R.id.map,map).addToBackStack(null).commit();
         Bundle bundle = getIntent().getExtras();
-        BufferedWriter bw = bundle.getParcelable("Writer");
+        bw = bundle.getParcelable("Writer");
     }
     public void setHome(Location location){
         Home = location;
+    }
+    public void GotoPoint(Location location) throws IOException {
+        Toast.makeText(this, "Going to next Point\n"+location.getLatitude()+","+location.getLongitude(), Toast.LENGTH_SHORT).show();
+        if(bw != null)
+            bw.write(location.getLatitude()+","+location.getLongitude());
     }
 }

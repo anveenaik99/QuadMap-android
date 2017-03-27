@@ -1,17 +1,23 @@
 package ash.quadmap_android;
 
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.icu.util.TimeUnit;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.util.TimeUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -27,6 +33,9 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.sql.Time;
 
 public class MapsActivity extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
@@ -49,7 +58,7 @@ public class MapsActivity extends Fragment implements
                 .findFragmentById(R.id.map);
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setInterval(2*1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1000);
 
         mGoogleApiClient = new GoogleApiClient.Builder(getContext())
@@ -74,12 +83,12 @@ public class MapsActivity extends Fragment implements
                     return;
                 }
                 mMap.setMyLocationEnabled(true);
-
-                // Add a marker in Sydney and move the camera
-                LatLng sydney = new LatLng(location.getLatitude(), location.getLongitude());
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(10.0f).build();
+                LatLng current = new LatLng(22,87);
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(current).build();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
                 mMap.moveCamera(cameraUpdate);
+                mMap.setOnInfoWindowClickListener(MapsActivity.this);
+                mMap.setOnMarkerClickListener(MapsActivity.this);
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
@@ -144,6 +153,7 @@ public class MapsActivity extends Fragment implements
     @Override
     public void onLocationChanged(Location _location) {
         location = _location;
+        ((Interface)getActivity()).setHome(location);
     }
 
     @Override
@@ -154,6 +164,14 @@ public class MapsActivity extends Fragment implements
 
     @Override
     public void onInfoWindowClick(Marker marker) {
+        Location i = new Location(LocationManager.GPS_PROVIDER);
+        i.setLatitude(marker.getPosition().latitude);
+        i.setLongitude(marker.getPosition().longitude);
+        try {
+            ((Interface)getActivity()).GotoPoint(i);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Log.i("Info","Info Marker");
     }
 }
