@@ -12,4 +12,9 @@
         android:orderInCategory="100"
         android:title="Single Point Mode"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/Go_Home"
+        android:orderInCategory="100"
+        android:title="Go Home"
+        app:showAsAction="never" />
 </menu>

@@ -38,13 +38,13 @@ public class Interface extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    if(mode == 1)
-                        GotoPoint(new Location[]{Home});
-                    else
-                        GotoPoint(locations);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if(bw != null) {
+                    try {
+                        bw.write("LAND");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(Interface.this, "Landing Quad", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -79,11 +79,20 @@ public class Interface extends AppCompatActivity {
             mode = 1;
             Toast.makeText(this, "Switched to Point Follow", Toast.LENGTH_SHORT).show();
         }
-        else
-            if(id == R.id.path_follow){
-                mode = 2;
-                Toast.makeText(this, "Switched to Path Follow", Toast.LENGTH_SHORT).show();
+        if(id == R.id.path_follow){
+            mode = 2;
+            Toast.makeText(this, "Switched to Path Follow", Toast.LENGTH_SHORT).show();
+        }
+        if(id == R.id.Go_Home){
+            if(bw != null){
+                Toast.makeText(this, "Quad coming back to your location.", Toast.LENGTH_SHORT).show();
+                try {
+                    bw.write("H"+","+Home.getLatitude()+","+Home.getLongitude());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        }
         return super.onOptionsItemSelected(item);
     }
 
