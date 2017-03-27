@@ -45,7 +45,7 @@
         <activity
             android:name=".Interface"
             android:label="@string/title_activity_interface"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
