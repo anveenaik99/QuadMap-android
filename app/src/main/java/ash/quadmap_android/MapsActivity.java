@@ -84,7 +84,7 @@ public class MapsActivity extends Fragment implements
                 }
                 mMap.setMyLocationEnabled(true);
                 LatLng current = new LatLng(22.3189734,87.3026368);
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(current).build();
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(current).zoom(17.0f).build();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
                 mMap.moveCamera(cameraUpdate);
                 mMap.setOnInfoWindowClickListener(MapsActivity.this);
