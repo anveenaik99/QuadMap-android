@@ -52,20 +52,14 @@ public class ConnectScreen extends AppCompatActivity {
                 Port.setText("");
             }
         });
-        if(!runtime_permissions()){
+        if(!runtime_permissions())
             enableButton();
-        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        myReciever = new MyReciever();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(GPSProvider.CONNECT);
-        registerReceiver(myReciever,intentFilter);
-        Intent i = new Intent(this,GPSProvider.class);
-        startService(i);
+        runtime_permissions();
     }
 
     private void enableButton(){
@@ -108,6 +102,12 @@ public class ConnectScreen extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode == 100){
             if( grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                myReciever = new MyReciever();
+                IntentFilter intentFilter = new IntentFilter();
+                intentFilter.addAction(GPSProvider.CONNECT);
+                registerReceiver(myReciever,intentFilter);
+                Intent i = new Intent(this,GPSProvider.class);
+                startService(i);
                 enableButton();
             }else {
                 runtime_permissions();
