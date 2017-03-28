@@ -55,17 +55,18 @@ public class Interface extends AppCompatActivity {
         port = bundle.getInt("Port");
         new Thread(new ClientThread()).start();
         try {
-            out = new PrintWriter(new BufferedWriter(
-                    new OutputStreamWriter(socket.getOutputStream())),
-                    true);
-            if(socket != null)
+            if(socket != null) {
+                out = new PrintWriter(new BufferedWriter(
+                        new OutputStreamWriter(socket.getOutputStream())),
+                        true);
                 Toast.makeText(this, "Successfully Connected to Server", Toast.LENGTH_SHORT).show();
+            }
             else
                 Toast.makeText(this, "Failed to connect to Server.\n" +
                         "        Try Again !!", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignored) {
+            Toast.makeText(this, "Failed to connect to Server.\n" +
+                    "        Try Again !!", Toast.LENGTH_SHORT).show();        }
         //client = new Client(getApplicationContext(),IP,port);
     }
 
