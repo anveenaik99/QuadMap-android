@@ -3,12 +3,16 @@ package ash.quadmap_android;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+
+import static java.security.AccessController.getContext;
 
 public class Client extends AsyncTask<Void,Void,BufferedWriter>{
 
@@ -24,16 +28,23 @@ public class Client extends AsyncTask<Void,Void,BufferedWriter>{
     }
     @Override
     protected BufferedWriter doInBackground(Void... voids) {
-        BufferedWriter bw;
-        bw = null;
+
+        Socket client;
         try {
-            Socket client = new Socket(host, soc);
+            client = new Socket(host, soc);
             os = new OutputStreamWriter(client.getOutputStream(), StandardCharsets.UTF_8);
             out = new PrintWriter(client.getOutputStream(), true);
-            bw = new BufferedWriter(out);
             Log.d("Client", "Successfully Executed");
-        }catch (IOException ignored) {
+        } catch (IOException ignored) {
             Log.e("ClientError","Can't Connect");
+        }
+        BufferedWriter bw = new BufferedWriter(out);
+        try {
+            bw.write("Connected");
+            bw.newLine();
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return bw;
     }

@@ -32,6 +32,7 @@ public class Interface extends AppCompatActivity {
     int port;
     Socket socket;
     PrintWriter out;
+    BufferedWriter bw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,13 @@ public class Interface extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(socket != null) {
-                    out.print("LAND");
+                    try {
+                        bw.write("LAND");
+                        bw.newLine();
+                        bw.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     Toast.makeText(Interface.this, "Landing Quad", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -53,21 +60,22 @@ public class Interface extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         IP = bundle.getString("IP");
         port = bundle.getInt("Port");
-        new Thread(new ClientThread()).start();
+        Client client = new Client(this,IP,port);
         try {
-            if(socket != null) {
-                out = new PrintWriter(new BufferedWriter(
-                        new OutputStreamWriter(socket.getOutputStream())),
-                        true);
-                Toast.makeText(this, "Successfully Connected to Server", Toast.LENGTH_SHORT).show();
-            }
-            else
-                Toast.makeText(this, "Failed to connect to Server.\n" +
-                        "        Try Again !!", Toast.LENGTH_SHORT).show();
-        } catch (IOException ignored) {
+            client.execute();
+            bw = client.get();
+            Toast.makeText(this, bw.toString(), Toast.LENGTH_SHORT).show();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        if(bw != null) {
+            Toast.makeText(this, "Successfully Connected to Server", Toast.LENGTH_SHORT).show();
+        }
+        else
             Toast.makeText(this, "Failed to connect to Server.\n" +
-                    "        Try Again !!", Toast.LENGTH_SHORT).show();        }
-        //client = new Client(getApplicationContext(),IP,port);
+                    "        Try Again !!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -89,9 +97,14 @@ public class Interface extends AppCompatActivity {
             Toast.makeText(this, "Switched to Path Follow", Toast.LENGTH_SHORT).show();
         }
         if(id == R.id.Go_Home){
-            if(socket != null){
+            if(bw != null){
                 Toast.makeText(this, "Quad coming back to your location.", Toast.LENGTH_SHORT).show();
-                out.print("H"+","+Home.getLatitude()+","+Home.getLongitude());
+                try {
+                    bw.write("H"+","+Home.getLatitude()+","+Home.getLongitude());
+                    bw.newLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return super.onOptionsItemSelected(item);
@@ -106,16 +119,19 @@ public class Interface extends AppCompatActivity {
         if(mode == 1) {
             location = _location[0];
             Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT).show();
-            if (socket != null)
-                out.print("A"+","+location.getLatitude() + "," + location.getLongitude());
+            if (bw != null)
+                bw.write("A"+","+location.getLatitude() + "," + location.getLongitude());
+                bw.newLine();
         }
         else {
             Toast.makeText(this, "Writing Array to Server" , Toast.LENGTH_SHORT).show();
-            if(socket != null) {
+            if(bw != null) {
                 for (Location a_location : _location) {
-                    out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
+                    bw.write("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
+                    bw.newLine();
                 }
-                out.print("X");
+                bw.write("X");
+                bw.newLine();
             }
         }
     }
@@ -131,23 +147,4 @@ public class Interface extends AppCompatActivity {
         return mode;
     }
 
-    class ClientThread implements Runnable {
-
-        @Override
-        public void run() {
-
-            try {
-                InetAddress serverAddr = InetAddress.getByName(IP);
-
-                socket = new Socket(serverAddr, port);
-
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
-        }
-
-    }
 }
