@@ -32,7 +32,6 @@ public class Interface extends AppCompatActivity {
     int port;
     Socket socket;
     PrintWriter out;
-    BufferedWriter bw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +43,9 @@ public class Interface extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(socket != null) {
-                    try {
-                        bw.write("LAND");
-                        bw.newLine();
-                        bw.flush();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                if(out != null) {
+                    out.write("LAND");
+                    out.flush();
                     Toast.makeText(Interface.this, "Landing Quad", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -63,14 +57,12 @@ public class Interface extends AppCompatActivity {
         Client client = new Client(this,IP,port);
         try {
             client.execute();
-            bw = client.get();
-            Toast.makeText(this, bw.toString(), Toast.LENGTH_SHORT).show();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+            out = client.get();
+            Toast.makeText(this, out.toString(), Toast.LENGTH_SHORT).show();
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        if(bw != null) {
+        if(out != null) {
             Toast.makeText(this, "Successfully Connected to Server", Toast.LENGTH_SHORT).show();
         }
         else
@@ -97,14 +89,9 @@ public class Interface extends AppCompatActivity {
             Toast.makeText(this, "Switched to Path Follow", Toast.LENGTH_SHORT).show();
         }
         if(id == R.id.Go_Home){
-            if(bw != null){
+            if(out != null){
                 Toast.makeText(this, "Quad coming back to your location.", Toast.LENGTH_SHORT).show();
-                try {
-                    bw.write("H"+","+Home.getLatitude()+","+Home.getLongitude());
-                    bw.newLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                out.write("H"+","+Home.getLatitude()+","+Home.getLongitude());
             }
         }
         return super.onOptionsItemSelected(item);
@@ -119,19 +106,16 @@ public class Interface extends AppCompatActivity {
         if(mode == 1) {
             location = _location[0];
             Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT).show();
-            if (bw != null)
-                bw.write("A"+","+location.getLatitude() + "," + location.getLongitude());
-                bw.newLine();
+            if (out != null)
+                out.write("A"+","+location.getLatitude() + "," + location.getLongitude());
         }
         else {
             Toast.makeText(this, "Writing Array to Server" , Toast.LENGTH_SHORT).show();
-            if(bw != null) {
+            if(out != null) {
                 for (Location a_location : _location) {
-                    bw.write("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
-                    bw.newLine();
+                    out.write("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
                 }
-                bw.write("X");
-                bw.newLine();
+                out.write("X");
             }
         }
     }
