@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -41,6 +42,7 @@ public class Interface extends AppCompatActivity {
     double height = 2;
     Menu menu;
     int point_no;
+    BufferedReader in;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +66,12 @@ public class Interface extends AppCompatActivity {
         IP = bundle.getString("IP");
         port = bundle.getInt("Port");
         Client client = new Client(this,IP,port);
+        ReaderClient reader = new ReaderClient(this,IP,port);
         try {
             client.execute();
+            reader.execute();
             out = client.get();
+            in = reader.get();
             //Toast.makeText(this, out.toString(), Toast.LENGTH_SHORT).show();
         } catch (InterruptedException | ExecutionException e) {
             Toast.makeText(this, "Can't Connect to Server.", Toast.LENGTH_SHORT).show();
@@ -206,5 +211,9 @@ public class Interface extends AppCompatActivity {
 
     int getPoint_no(){
         return point_no;
+    }
+
+    BufferedReader getIn(){
+        return in;
     }
 }

@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.icu.util.TimeUnit;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -48,6 +49,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -69,6 +71,7 @@ public class MapsActivity extends Fragment implements
     List<LatLng> locations = new ArrayList<>();
     List<Double> heights = new ArrayList<>();
     boolean markercheck;
+    Marker lastQuadMark;
 
     public MapsActivity(){
 
@@ -96,6 +99,31 @@ public class MapsActivity extends Fragment implements
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
+        Thread getQuadPosition = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String GPS = null;
+                BufferedReader in = ((Interface)getActivity()).getIn();
+                try {
+                    if(in != null)
+                        GPS = in.readLine();
+                } catch (IOException ignored) {
+                }finally {
+                    if(GPS != null) {
+                        String[] latlng = GPS.split(",");
+                        LatLng latLng = new LatLng(Double.parseDouble(latlng[0]),Double.parseDouble(latlng[1]));
+                        if(lastQuadMark != null)
+                            lastQuadMark.remove();
+                        MarkerOptions options = new MarkerOptions()
+                                .position(latLng)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.quad));
+                        lastQuadMark = mMap.addMarker(options);
+                    }
+                }
+            }
+        });
+        getQuadPosition.start();
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
