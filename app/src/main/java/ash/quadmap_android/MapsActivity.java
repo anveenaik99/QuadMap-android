@@ -117,9 +117,9 @@ public class MapsActivity extends Fragment implements
                 mMap.setOnMarkerClickListener(MapsActivity.this);
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
-                    public void onMapClick(LatLng latLng) {
+                    public void onMapClick(final LatLng latLng) {
                         if(((Interface) getActivity()).getHeightStatus()) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                             builder.setTitle("Set Height for Marker");
                             final EditText input = new EditText(getContext());
                             builder.setView(input);
@@ -137,9 +137,30 @@ public class MapsActivity extends Fragment implements
                                     dialog.cancel();
                                 }
                             });
-
+                            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialogInterface) {
+                                    if (((Interface) getActivity()).getMode() == 1) {
+                                        mMap.clear();
+                                        MarkerOptions options = new MarkerOptions()
+                                                .position(latLng)
+                                                .title("Tap to send quad");
+                                        mMap.addMarker(options);
+                                    } else {
+                                        ((Interface)getActivity()).incPoint_no();
+                                        MarkerOptions options = new MarkerOptions()
+                                                .position(latLng)
+                                                .title("Tap to send to selected waypoints")
+                                                .icon(getTextMarker(Integer.toString(((Interface)getActivity()).getPoint_no())));
+                                        mMap.addMarker(options);
+                                        locations.add(latLng);
+                                    }
+                                }
+                            });
                             builder.show();
-                        } else markercheck = true;
+                        } else {
+                            markercheck = true;
+                        }
                         if(markercheck) {
                             if (((Interface) getActivity()).getMode() == 1) {
                                 mMap.clear();
