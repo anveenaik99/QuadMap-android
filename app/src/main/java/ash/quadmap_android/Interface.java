@@ -39,6 +39,8 @@ public class Interface extends AppCompatActivity {
     PrintWriter out;
     boolean customHeight = false;
     double height = 2;
+    Menu menu;
+    int point_no;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +67,9 @@ public class Interface extends AppCompatActivity {
         try {
             client.execute();
             out = client.get();
-            Toast.makeText(this, out.toString(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, out.toString(), Toast.LENGTH_SHORT).show();
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            Toast.makeText(this, "Can't Connect to Server.", Toast.LENGTH_SHORT).show();
         }
         if(out != null) {
             Toast.makeText(this, "Successfully Connected to Server", Toast.LENGTH_SHORT).show();
@@ -79,22 +81,26 @@ public class Interface extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.findItem(R.id.height).setTitle("Set Height ("+height+"m)");
         getMenuInflater().inflate(R.menu.menu_interface,menu);
+        this.menu = menu;
+        menu.findItem(R.id.height).setTitle("Custom Height (Def "+height+"m)");
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         int id = item.getItemId();
 
         if(id == R.id.point_follow){
             mode = 1;
             Toast.makeText(this, "Switched to Point Follow", Toast.LENGTH_SHORT).show();
+            point_no = 0;
         }
         if(id == R.id.path_follow){
             mode = 2;
             Toast.makeText(this, "Switched to Path Follow", Toast.LENGTH_SHORT).show();
+            point_no = 0;
+
         }
         if(id == R.id.Go_Home){
             if(out != null){
@@ -115,13 +121,14 @@ public class Interface extends AppCompatActivity {
         }
         if(id == R.id.default_height){
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Set Default Height");
+            builder.setTitle("Set Height");
             final EditText input = new EditText(this);
             builder.setView(input);
             builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     height = Double.parseDouble(input.getText().toString());
+                    menu.findItem(R.id.height).setTitle("Custom Height (Def "+height+"m)");
                 }
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -144,14 +151,16 @@ public class Interface extends AppCompatActivity {
         Location location;
         if(mode == 1) {
             location = _location[0];
-            Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude()+","+Double.toString(heights.get(0)), Toast.LENGTH_SHORT).show();
-            if (out != null)
-                if(customHeight){
+            if (out != null) {
+                if (customHeight) {
+                    Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(heights.get(0)), Toast.LENGTH_SHORT).show();
                     out.print("A" + "," + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(heights.get(0)));
-                }
-                else
+                } else {
+                    Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(this.height), Toast.LENGTH_SHORT).show();
                     out.print("A" + "," + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(this.height));
-            out.flush();
+                }
+                out.flush();
+            }
         }
         else {
             Toast.makeText(this, "Writing Array to Server" , Toast.LENGTH_SHORT).show();
@@ -191,5 +200,11 @@ public class Interface extends AppCompatActivity {
     public boolean getHeightStatus(){
         return customHeight;
     }
+    void incPoint_no(){
+        point_no++;
+    }
 
+    int getPoint_no(){
+        return point_no;
+    }
 }

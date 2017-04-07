@@ -63,7 +63,6 @@ public class MapsActivity extends Fragment implements
     LocationRequest mLocationRequest;
     Marker lastOpened = null;
     List<LatLng> locations = new ArrayList<>();
-    int point_no = 0;
     List<Double> heights = new ArrayList<>();
     boolean markercheck;
 
@@ -119,21 +118,44 @@ public class MapsActivity extends Fragment implements
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
-                        if(((Interface)getActivity()).getMode() == 1) {
-                            mMap.clear();
-                            MarkerOptions options = new MarkerOptions()
-                                    .position(latLng)
-                                    .title("Tap to send quad");
-                            mMap.addMarker(options);
-                        }
-                        else{
-                            point_no++;
-                            MarkerOptions options = new MarkerOptions()
-                                    .position(latLng)
-                                    .title("Tap to send to selected waypoints")
-                                    .icon(getTextMarker(Integer.toString(point_no)));
-                            mMap.addMarker(options);
-                            locations.add(latLng);
+                        if(((Interface) getActivity()).getHeightStatus()) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("Set Height for Marker");
+                            final EditText input = new EditText(getContext());
+                            builder.setView(input);
+                            markercheck = false;
+                            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    heights.add(Double.parseDouble(input.getText().toString()));
+                                    markercheck = true;
+                                }
+                            });
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                            builder.show();
+                        } else markercheck = true;
+                        if(markercheck) {
+                            if (((Interface) getActivity()).getMode() == 1) {
+                                mMap.clear();
+                                MarkerOptions options = new MarkerOptions()
+                                        .position(latLng)
+                                        .title("Tap to send quad");
+                                mMap.addMarker(options);
+                            } else {
+                                ((Interface)getActivity()).incPoint_no();
+                                MarkerOptions options = new MarkerOptions()
+                                        .position(latLng)
+                                        .title("Tap to send to selected waypoints")
+                                        .icon(getTextMarker(Integer.toString(((Interface)getActivity()).getPoint_no())));
+                                mMap.addMarker(options);
+                                locations.add(latLng);
+                            }
                         }
                        // mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
@@ -196,29 +218,7 @@ public class MapsActivity extends Fragment implements
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
-        if(((Interface) getActivity()).getHeightStatus()) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle("Set Height for Marker");
-            final EditText input = new EditText(getContext());
-            builder.setView(input);
-            markercheck = false;
-            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    heights.add(Double.parseDouble(input.getText().toString()));
-                    markercheck = true;
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-
-            builder.show();
-        } else markercheck = true;
+    public boolean onMarkerClick(final Marker marker) {
 
         if(markercheck) {
             if (((Interface) getActivity()).getMode() == 1) {
@@ -250,10 +250,11 @@ public class MapsActivity extends Fragment implements
             }
             Log.i("Info", "Info Marker");
             mMap.clear();
+            heights.clear();
         }
         else{
             List<Location> points = new ArrayList<>();
-            for(int i = 0; i < point_no; i++){
+            for(int i = 0; i < ((Interface)getActivity()).getPoint_no(); i++){
                 Location loc = new Location(LocationManager.GPS_PROVIDER);
                 loc.setLatitude((locations.get(i)).latitude);
                 loc.setLongitude((locations.get(i)).longitude);
@@ -267,6 +268,7 @@ public class MapsActivity extends Fragment implements
                 e.printStackTrace();
             }
             mMap.clear();
+            heights.clear();
         }
     }
 
