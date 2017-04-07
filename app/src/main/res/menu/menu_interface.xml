@@ -2,24 +2,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="ash.quadmap_android.Interface">
-    <group></group>
-    <group>
-        <item
+
+    <item
         android:id="@+id/Go_Home"
         android:orderInCategory="100"
         android:title="Go Home"
-        app:showAsAction="never" />
-    <item android:title="Item"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_home"/>
+
+    <item
+        android:title="Item"
         android:checkable="true"
         android:checked="true"
         android:id="@+id/height"/>
-        <item
-            android:id="@+id/path_follow"
-            android:orderInCategory="100"
-            android:title="Path Following Mode" />
-    </group>
+
     <item
-    android:id="@+id/point_follow"
-    android:orderInCategory="101"
-    android:title="Single Point Mode" />
+        android:id="@+id/path_follow"
+        android:orderInCategory="100"
+        android:title="Path Following Mode" />
+
+    <item
+        android:id="@+id/point_follow"
+        android:orderInCategory="101"
+        android:title="Single Point Mode" />
+    <item
+        android:id="@+id/default_height"
+        android:title="Set Default Height"/>
 </menu>

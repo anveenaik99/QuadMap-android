@@ -1,5 +1,6 @@
 package ash.quadmap_android;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -7,12 +8,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.BufferedWriter;
@@ -35,7 +38,7 @@ public class Interface extends AppCompatActivity {
     Socket socket;
     PrintWriter out;
     boolean customHeight = false;
-    float height = 2;
+    double height = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +112,26 @@ public class Interface extends AppCompatActivity {
                 item.setChecked(true);
                 customHeight = true;
             }
+        }
+        if(id == R.id.default_height){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Set Default Height");
+            final EditText input = new EditText(this);
+            builder.setView(input);
+            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    height = Double.parseDouble(input.getText().toString());
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
         }
         return super.onOptionsItemSelected(item);
     }
