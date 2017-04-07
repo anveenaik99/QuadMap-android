@@ -235,6 +235,7 @@ public class MapsActivity extends Fragment implements
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            mMap.clear();
         }
     }
 

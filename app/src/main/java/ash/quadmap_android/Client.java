@@ -35,8 +35,8 @@ public class Client extends AsyncTask<Void,Void,PrintWriter>{
             os = new OutputStreamWriter(
                     client.getOutputStream(), StandardCharsets.UTF_8);
             out = new PrintWriter(new BufferedWriter(os), true);
-            out.println("Chal gaaya");
-            out.flush();
+           // out.println("Chal gaaya");
+           // out.flush();
             //bw = new BufferedWriter(out);
             Log.d("Client", "Successfully Excuted");
         }catch (IOException ignored) {

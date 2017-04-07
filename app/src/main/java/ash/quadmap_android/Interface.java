@@ -44,7 +44,7 @@ public class Interface extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(out != null) {
-                    out.println("LAND");
+                    out.print("LAND");
                     out.flush();
                     Toast.makeText(Interface.this, "Landing Quad", Toast.LENGTH_SHORT).show();
                 }
@@ -91,7 +91,7 @@ public class Interface extends AppCompatActivity {
         if(id == R.id.Go_Home){
             if(out != null){
                 Toast.makeText(this, "Quad coming back to your location.", Toast.LENGTH_SHORT).show();
-                out.println("H"+","+Home.getLatitude()+","+Home.getLongitude());
+                out.print("H"+","+Home.getLatitude()+","+Home.getLongitude());
                 out.flush();
             }
         }
@@ -108,17 +108,17 @@ public class Interface extends AppCompatActivity {
             location = _location[0];
             Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT).show();
             if (out != null)
-                out.println("A"+","+location.getLatitude() + "," + location.getLongitude());
+                out.print("A"+","+location.getLatitude() + "," + location.getLongitude());
                 out.flush();
         }
         else {
             Toast.makeText(this, "Writing Array to Server" , Toast.LENGTH_SHORT).show();
             if(out != null) {
                 for (Location a_location : _location) {
-                    out.println("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
+                    out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
                     out.flush();
                 }
-                out.println("X");
+                out.print("X");
                 out.flush();
             }
         }
