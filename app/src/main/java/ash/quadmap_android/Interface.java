@@ -22,6 +22,8 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 public class Interface extends AppCompatActivity {
@@ -32,6 +34,8 @@ public class Interface extends AppCompatActivity {
     int port;
     Socket socket;
     PrintWriter out;
+    boolean customHeight = false;
+    float height = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +76,7 @@ public class Interface extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu.findItem(R.id.height).setTitle("Set Height ("+height+"m)");
         getMenuInflater().inflate(R.menu.menu_interface,menu);
         return true;
     }
@@ -95,6 +100,16 @@ public class Interface extends AppCompatActivity {
                 out.flush();
             }
         }
+        if(id == R.id.height){
+            if(item.isChecked()){
+                customHeight = false;
+                item.setChecked(false);
+            }
+            else {
+                item.setChecked(true);
+                customHeight = true;
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -102,21 +117,36 @@ public class Interface extends AppCompatActivity {
         Home = location;
         Log.i("Home","Updated current location");
     }
-    public void GotoPoint(Location[] _location) throws IOException {
+    public void GotoPoint(Location[] _location,List<Double> heights) throws IOException {
         Location location;
         if(mode == 1) {
             location = _location[0];
-            Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude()+","+Double.toString(heights.get(0)), Toast.LENGTH_SHORT).show();
             if (out != null)
-                out.print("A"+","+location.getLatitude() + "," + location.getLongitude());
-                out.flush();
+                if(customHeight){
+                    out.print("A" + "," + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(heights.get(0)));
+                }
+                else
+                    out.print("A" + "," + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(this.height));
+            out.flush();
         }
         else {
             Toast.makeText(this, "Writing Array to Server" , Toast.LENGTH_SHORT).show();
             if(out != null) {
-                for (Location a_location : _location) {
-                    out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude());
-                    out.flush();
+                if(customHeight) {
+                    int i = 0;
+                    for (Location a_location : _location) {
+                        out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(heights.get(i)));
+                        out.flush();
+                        i++;
+                    }
+                }
+                else
+                {
+                    for (Location a_location : _location) {
+                        out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(this.height));
+                        out.flush();
+                    }
                 }
                 out.print("X");
                 out.flush();
@@ -133,6 +163,10 @@ public class Interface extends AppCompatActivity {
 
     public int getMode(){
         return mode;
+    }
+
+    public boolean getHeightStatus(){
+        return customHeight;
     }
 
 }

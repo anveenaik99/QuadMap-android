@@ -1,6 +1,7 @@
 package ash.quadmap_android;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,10 +18,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.util.TimeUtils;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -59,6 +64,8 @@ public class MapsActivity extends Fragment implements
     Marker lastOpened = null;
     List<LatLng> locations = new ArrayList<>();
     int point_no = 0;
+    List<Double> heights = new ArrayList<>();
+    boolean markercheck;
 
     public MapsActivity(){
 
@@ -190,17 +197,41 @@ public class MapsActivity extends Fragment implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if(((Interface)getActivity()).getMode() == 1) {
-            Log.i("Marker", "Click Marker");
-            lastOpened = marker;
-            Snackbar snack = Snackbar.make(getView(), lastOpened.getPosition().latitude +
-                    "," +
-                    lastOpened.getPosition().longitude, Snackbar.LENGTH_LONG);
-            lastOpened.showInfoWindow();
-            snack.show();
-        }
-        else{
-            marker.showInfoWindow();
+        if(((Interface) getActivity()).getHeightStatus()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Set Height for Marker");
+            final EditText input = new EditText(getContext());
+            builder.setView(input);
+            markercheck = false;
+            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    heights.add(Double.parseDouble(input.getText().toString()));
+                    markercheck = true;
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+        } else markercheck = true;
+
+        if(markercheck) {
+            if (((Interface) getActivity()).getMode() == 1) {
+                Log.i("Marker", "Click Marker");
+                lastOpened = marker;
+                Snackbar snack = Snackbar.make(getView(), lastOpened.getPosition().latitude +
+                        "," +
+                        lastOpened.getPosition().longitude, Snackbar.LENGTH_LONG);
+                lastOpened.showInfoWindow();
+                snack.show();
+            } else {
+                marker.showInfoWindow();
+            }
         }
         return true;
     }
@@ -213,7 +244,7 @@ public class MapsActivity extends Fragment implements
             i.setLongitude(marker.getPosition().longitude);
             Location point[] = {i};
             try {
-                ((Interface) getActivity()).GotoPoint(point);
+                ((Interface) getActivity()).GotoPoint(point, heights);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -230,7 +261,7 @@ public class MapsActivity extends Fragment implements
             }
             Location[] points_array = (Location[]) points.toArray(new Location[points.size()]);
             try {
-                ((Interface) getActivity()).GotoPoint(points_array);
+                ((Interface) getActivity()).GotoPoint(points_array,heights);
                 Log.i("Mode 2","Sending Data");
             } catch (IOException e) {
                 e.printStackTrace();

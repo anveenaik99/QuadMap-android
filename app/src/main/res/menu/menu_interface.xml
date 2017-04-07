@@ -2,19 +2,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="ash.quadmap_android.Interface">
-    <item
-        android:id="@+id/path_follow"
-        android:orderInCategory="100"
-        android:title="Path Following Mode"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/point_follow"
-        android:orderInCategory="100"
-        android:title="Single Point Mode"
-        app:showAsAction="never" />
-    <item
+    <group></group>
+    <group>
+        <item
         android:id="@+id/Go_Home"
         android:orderInCategory="100"
         android:title="Go Home"
         app:showAsAction="never" />
+    <item android:title="Item"
+        android:checkable="true"
+        android:checked="true"
+        android:id="@+id/height"/>
+        <item
+            android:id="@+id/path_follow"
+            android:orderInCategory="100"
+            android:title="Path Following Mode" />
+    </group>
+    <item
+    android:id="@+id/point_follow"
+    android:orderInCategory="101"
+    android:title="Single Point Mode" />
 </menu>
