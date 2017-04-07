@@ -168,7 +168,7 @@ public class Interface extends AppCompatActivity {
                 if(customHeight) {
                     int i = 0;
                     for (Location a_location : _location) {
-                        out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(heights.get(i)));
+                        out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(heights.get(i))+"?");
                         out.flush();
                         i++;
                     }
@@ -176,7 +176,7 @@ public class Interface extends AppCompatActivity {
                 else
                 {
                     for (Location a_location : _location) {
-                        out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(this.height));
+                        out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(this.height)+"?");
                         out.flush();
                     }
                 }
