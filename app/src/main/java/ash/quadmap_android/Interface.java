@@ -100,7 +100,6 @@ public class Interface extends AppCompatActivity {
             mode = 2;
             Toast.makeText(this, "Switched to Path Follow", Toast.LENGTH_SHORT).show();
             point_no = 0;
-
         }
         if(id == R.id.Go_Home){
             if(out != null){
@@ -183,6 +182,7 @@ public class Interface extends AppCompatActivity {
                 out.print("X");
                 out.flush();
             }
+            point_no = 0;
         }
     }
 

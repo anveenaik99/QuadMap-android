@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.icu.util.TimeUnit;
 import android.location.Location;
@@ -44,6 +45,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
 import java.sql.Time;
@@ -60,6 +63,7 @@ public class MapsActivity extends Fragment implements
     private GoogleMap mMap;
     GoogleApiClient mGoogleApiClient;
     Location location;
+    LatLng last_location = null;
     LocationRequest mLocationRequest;
     Marker lastOpened = null;
     List<LatLng> locations = new ArrayList<>();
@@ -140,44 +144,14 @@ public class MapsActivity extends Fragment implements
                             builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                                 @Override
                                 public void onDismiss(DialogInterface dialogInterface) {
-                                    if (((Interface) getActivity()).getMode() == 1) {
-                                        mMap.clear();
-                                        MarkerOptions options = new MarkerOptions()
-                                                .position(latLng)
-                                                .title("Tap to send quad");
-                                        mMap.addMarker(options);
-                                    } else {
-                                        ((Interface)getActivity()).incPoint_no();
-                                        MarkerOptions options = new MarkerOptions()
-                                                .position(latLng)
-                                                .title("Tap to send to selected waypoints")
-                                                .icon(getTextMarker(Integer.toString(((Interface)getActivity()).getPoint_no())));
-                                        mMap.addMarker(options);
-                                        locations.add(latLng);
-                                    }
+                                    makeMarker(latLng);
                                 }
                             });
                             builder.show();
                         } else {
                             markercheck = true;
                         }
-                        if(markercheck) {
-                            if (((Interface) getActivity()).getMode() == 1) {
-                                mMap.clear();
-                                MarkerOptions options = new MarkerOptions()
-                                        .position(latLng)
-                                        .title("Tap to send quad");
-                                mMap.addMarker(options);
-                            } else {
-                                ((Interface)getActivity()).incPoint_no();
-                                MarkerOptions options = new MarkerOptions()
-                                        .position(latLng)
-                                        .title("Tap to send to selected waypoints")
-                                        .icon(getTextMarker(Integer.toString(((Interface)getActivity()).getPoint_no())));
-                                mMap.addMarker(options);
-                                locations.add(latLng);
-                            }
-                        }
+                        makeMarker(latLng);
                        // mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
                 });
@@ -186,6 +160,37 @@ public class MapsActivity extends Fragment implements
         return v;
     }
 
+    void makeMarker(LatLng latLng){
+        if(markercheck) {
+            if (((Interface) getActivity()).getMode() == 1) {
+                mMap.clear();
+                last_location = null;
+                MarkerOptions options = new MarkerOptions()
+                        .position(latLng)
+                        .title("Tap to send quad");
+                mMap.addMarker(options);
+            } else {
+                if(((Interface)getActivity()).getPoint_no() == 0) {
+                    mMap.clear();
+                    heights.clear();
+                    last_location = null;
+                }
+                ((Interface)getActivity()).incPoint_no();
+                MarkerOptions options = new MarkerOptions()
+                        .position(latLng)
+                        .title("Tap to send to selected waypoints")
+                        .icon(getTextMarker(Integer.toString(((Interface)getActivity()).getPoint_no())));
+                mMap.addMarker(options);
+                locations.add(latLng);
+                if(last_location != null)
+                    mMap.addPolyline(new PolylineOptions()
+                            .add(last_location,latLng)
+                            .width(5)
+                            .color(Color.RED));
+                last_location = latLng;
+            }
+        }
+    }
     @Override
     public void onResume() {
         super.onResume();
@@ -241,7 +246,6 @@ public class MapsActivity extends Fragment implements
     @Override
     public boolean onMarkerClick(final Marker marker) {
 
-        if(markercheck) {
             if (((Interface) getActivity()).getMode() == 1) {
                 Log.i("Marker", "Click Marker");
                 lastOpened = marker;
@@ -253,7 +257,6 @@ public class MapsActivity extends Fragment implements
             } else {
                 marker.showInfoWindow();
             }
-        }
         return true;
     }
 
@@ -272,6 +275,7 @@ public class MapsActivity extends Fragment implements
             Log.i("Info", "Info Marker");
             mMap.clear();
             heights.clear();
+            last_location = null;
         }
         else{
             List<Location> points = new ArrayList<>();
@@ -290,6 +294,8 @@ public class MapsActivity extends Fragment implements
             }
             mMap.clear();
             heights.clear();
+            last_location = null;
+
         }
     }
 
