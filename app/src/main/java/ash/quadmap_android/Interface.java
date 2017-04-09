@@ -36,13 +36,13 @@ public class Interface extends AppCompatActivity {
     public int mode = 1;
     String IP;
     int port;
-    Socket socket;
     PrintWriter out;
     boolean customHeight = false;
     double height = 2;
     Menu menu;
     int point_no;
     BufferedReader in;
+    String quadGPS = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +82,17 @@ public class Interface extends AppCompatActivity {
         else
             Toast.makeText(this, "Failed to connect to Server.\n" +
                     "        Try Again !!", Toast.LENGTH_SHORT).show();
+        Thread quad = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    quadGPS = in.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        quad.start();
     }
 
     @Override
@@ -211,7 +222,8 @@ public class Interface extends AppCompatActivity {
         return point_no;
     }
 
-    BufferedReader getIn(){
-        return in;
+    String getIn() {
+        //Toast.makeText(this, quadGPS, Toast.LENGTH_SHORT).show();
+        return quadGPS;
     }
 }

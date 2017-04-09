@@ -75,7 +75,12 @@ public class MapsActivity extends Fragment implements
     boolean markercheck;
     Marker lastQuadMark;
     Handler UI = new Handler();
-    Runnable runnable;
+    int height = 100;
+    int width = 100;
+    BitmapDrawable bitmapdraw = null;
+
+    Bitmap b;
+    Bitmap smallMarker;
     public MapsActivity(){
 
     }
@@ -102,47 +107,11 @@ public class MapsActivity extends Fragment implements
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                String GPS = null;
-                BufferedReader in = null;
-                int height = 100;
-                int width = 100;
-                BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.quad);
-                Bitmap b=bitmapdraw.getBitmap();
-                Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
-                //Test Code////////////////////////////////////////////////////////////
-                MarkerOptions op = new MarkerOptions()
-                        .position(new LatLng(22.317946,87.3051))
-                        .icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-                        mMap.addMarker(op);
-                ////////////////////////////////////////////////////////////////////////
-                while (mGoogleApiClient.isConnected()) {
-                    try {
-                        if (in != null)
-                            GPS = in.readLine();
-                        else
-                            in = ((Interface)getActivity()).getIn();
-                    } catch (IOException ignored) {
-                    } finally {
-                        if (GPS != null) {
-                            Log.i("Reader","GPS Recieved");
-                            String[] latlng = GPS.split(",");
-                            LatLng latLng = new LatLng(Double.parseDouble(latlng[0]), Double.parseDouble(latlng[1]));
-                            if (lastQuadMark != null)
-                                lastQuadMark.remove();
-                            MarkerOptions options = new MarkerOptions()
-                                    .position(latLng)
-                                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-                            lastQuadMark = mMap.addMarker(options);
-                        }
-                    }
-                }
-            }
-        };
-        UI.postDelayed(runnable,10);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.quad);
+        }
+        b = bitmapdraw.getBitmap();
+        smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
@@ -159,6 +128,7 @@ public class MapsActivity extends Fragment implements
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
+                UI.post(new updater(UI));
                 mMap.setMyLocationEnabled(true);
                 LatLng current = new LatLng(22.3189734,87.3026368);
                 CameraPosition cameraPosition = new CameraPosition.Builder().target(current).zoom(17.0f).build();
@@ -374,5 +344,32 @@ public class MapsActivity extends Fragment implements
         canvas.drawText(text, 0, 0, paint);
         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(image);
         return icon;
+    }
+
+    class updater implements Runnable {
+        final Handler mHandler;
+
+        updater(Handler mHandler) {
+            this.mHandler = mHandler;
+        }
+
+        @Override
+        public void run() {
+            mHandler.postDelayed(this,50);
+            String GPS = null;
+            GPS = ((Interface) getActivity()).getIn();
+            Log.i("Debug","In Runnable");
+            if (GPS != null) {
+                Log.i("Reader", "GPS Recieved");
+                String[] latlng = GPS.split(",");
+                LatLng latLng = new LatLng(Double.parseDouble(latlng[0]), Double.parseDouble(latlng[1]));
+                if (lastQuadMark != null)
+                    lastQuadMark.remove();
+                MarkerOptions options = new MarkerOptions()
+                        .position(latLng)
+                        .icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+                lastQuadMark = mMap.addMarker(options);
+            }
+        }
     }
 }
