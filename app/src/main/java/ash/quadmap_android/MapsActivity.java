@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.icu.util.TimeUnit;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -72,7 +73,8 @@ public class MapsActivity extends Fragment implements
     List<Double> heights = new ArrayList<>();
     boolean markercheck;
     Marker lastQuadMark;
-
+    Handler UI = new Handler();
+    Runnable runnable;
     public MapsActivity(){
 
     }
@@ -100,30 +102,41 @@ public class MapsActivity extends Fragment implements
                 .addApi(LocationServices.API)
                 .build();
 
-        Thread getQuadPosition = new Thread(new Runnable() {
+        runnable = new Runnable() {
             @Override
             public void run() {
                 String GPS = null;
-                BufferedReader in = ((Interface)getActivity()).getIn();
-                try {
-                    if(in != null)
-                        GPS = in.readLine();
-                } catch (IOException ignored) {
-                }finally {
-                    if(GPS != null) {
-                        String[] latlng = GPS.split(",");
-                        LatLng latLng = new LatLng(Double.parseDouble(latlng[0]),Double.parseDouble(latlng[1]));
-                        if(lastQuadMark != null)
-                            lastQuadMark.remove();
-                        MarkerOptions options = new MarkerOptions()
-                                .position(latLng)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.quad));
-                        lastQuadMark = mMap.addMarker(options);
+                BufferedReader in = null;
+                //Test Code////////////////////////////////////////////////////////////
+                MarkerOptions op = new MarkerOptions()
+                        .position(new LatLng(22.317946,87.3051))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.quad));
+                        mMap.addMarker(op);
+                ////////////////////////////////////////////////////////////////////////
+                while (mGoogleApiClient.isConnected()) {
+                    try {
+                        if (in != null)
+                            GPS = in.readLine();
+                        else
+                            in = ((Interface)getActivity()).getIn();
+                    } catch (IOException ignored) {
+                    } finally {
+                        if (GPS != null) {
+                            Log.i("Reader","GPS Recieved");
+                            String[] latlng = GPS.split(",");
+                            LatLng latLng = new LatLng(Double.parseDouble(latlng[0]), Double.parseDouble(latlng[1]));
+                            if (lastQuadMark != null)
+                                lastQuadMark.remove();
+                            MarkerOptions options = new MarkerOptions()
+                                    .position(latLng)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.quad));
+                            lastQuadMark = mMap.addMarker(options);
+                        }
                     }
                 }
             }
-        });
-        getQuadPosition.start();
+        };
+        UI.postDelayed(runnable,10);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
@@ -150,16 +163,18 @@ public class MapsActivity extends Fragment implements
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(final LatLng latLng) {
+                        final double[] height = new double[1];
                         if(((Interface) getActivity()).getHeightStatus()) {
                             final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                             builder.setTitle("Set Height for Marker");
                             final EditText input = new EditText(getContext());
                             builder.setView(input);
                             markercheck = false;
+
                             builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    heights.add(Double.parseDouble(input.getText().toString()));
+                                    height[0] = Double.parseDouble(input.getText().toString());
                                     markercheck = true;
                                 }
                             });
@@ -172,14 +187,14 @@ public class MapsActivity extends Fragment implements
                             builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                                 @Override
                                 public void onDismiss(DialogInterface dialogInterface) {
-                                    makeMarker(latLng);
+                                    makeMarker(latLng,height[0]);
                                 }
                             });
                             builder.show();
                         } else {
                             markercheck = true;
                         }
-                        makeMarker(latLng);
+                        makeMarker(latLng,height[0]);
                        // mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
                 });
@@ -188,7 +203,7 @@ public class MapsActivity extends Fragment implements
         return v;
     }
 
-    void makeMarker(LatLng latLng){
+    void makeMarker(LatLng latLng,double height){
         if(markercheck) {
             if (((Interface) getActivity()).getMode() == 1) {
                 mMap.clear();
@@ -197,6 +212,8 @@ public class MapsActivity extends Fragment implements
                         .position(latLng)
                         .title("Tap to send quad");
                 mMap.addMarker(options);
+                locations.add(latLng);
+                heights.add(height);
             } else {
                 if(((Interface)getActivity()).getPoint_no() == 0) {
                     mMap.clear();
@@ -210,6 +227,7 @@ public class MapsActivity extends Fragment implements
                         .icon(getTextMarker(Integer.toString(((Interface)getActivity()).getPoint_no())));
                 mMap.addMarker(options);
                 locations.add(latLng);
+                heights.add(height);
                 if(last_location != null)
                     mMap.addPolyline(new PolylineOptions()
                             .add(last_location,latLng)
@@ -295,8 +313,9 @@ public class MapsActivity extends Fragment implements
             i.setLatitude(marker.getPosition().latitude);
             i.setLongitude(marker.getPosition().longitude);
             Location point[] = {i};
+            Double[] ht = heights.toArray(new Double[heights.size()]);
             try {
-                ((Interface) getActivity()).GotoPoint(point, heights);
+                ((Interface) getActivity()).GotoPoint(point, ht);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -314,8 +333,9 @@ public class MapsActivity extends Fragment implements
                 points.add(loc);
             }
             Location[] points_array = (Location[]) points.toArray(new Location[points.size()]);
+            Double[] ht = heights.toArray(new Double[heights.size()]);
             try {
-                ((Interface) getActivity()).GotoPoint(points_array,heights);
+                ((Interface) getActivity()).GotoPoint(points_array,ht);
                 Log.i("Mode 2","Sending Data");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -323,7 +343,7 @@ public class MapsActivity extends Fragment implements
             mMap.clear();
             heights.clear();
             last_location = null;
-
+            locations.clear();
         }
     }
 

@@ -109,7 +109,7 @@ public class Interface extends AppCompatActivity {
         if(id == R.id.Go_Home){
             if(out != null){
                 Toast.makeText(this, "Quad coming back to your location.", Toast.LENGTH_SHORT).show();
-                out.print("H"+","+Home.getLatitude()+","+Home.getLongitude());
+                out.print("H"+Home.getLatitude()+","+Home.getLongitude()+","+this.height);
                 out.flush();
             }
         }
@@ -151,17 +151,17 @@ public class Interface extends AppCompatActivity {
         Home = location;
         Log.i("Home","Updated current location");
     }
-    public void GotoPoint(Location[] _location,List<Double> heights) throws IOException {
+    public void GotoPoint(Location[] _location,Double[] heights) throws IOException {
         Location location;
         if(mode == 1) {
             location = _location[0];
             if (out != null) {
                 if (customHeight) {
-                    Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(heights.get(0)), Toast.LENGTH_SHORT).show();
-                    out.print("A" + "," + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(heights.get(0)));
+                    Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude() + "," + heights[0], Toast.LENGTH_SHORT).show();
+                    out.print("A" + location.getLatitude() + "," + location.getLongitude() + "," + heights[0]);
                 } else {
-                    Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(this.height), Toast.LENGTH_SHORT).show();
-                    out.print("A" + "," + location.getLatitude() + "," + location.getLongitude() + "," + Double.toString(this.height));
+                    Toast.makeText(this, "Going to next Point\n" + location.getLatitude() + "," + location.getLongitude() + "," + this.height, Toast.LENGTH_SHORT).show();
+                    out.print("A" + location.getLatitude() + "," + location.getLongitude() + "," + this.height);
                 }
                 out.flush();
             }
@@ -172,7 +172,7 @@ public class Interface extends AppCompatActivity {
                 if(customHeight) {
                     int i = 0;
                     for (Location a_location : _location) {
-                        out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(heights.get(i))+"?");
+                        out.print("B" + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(heights[i]));
                         out.flush();
                         i++;
                     }
@@ -180,12 +180,10 @@ public class Interface extends AppCompatActivity {
                 else
                 {
                     for (Location a_location : _location) {
-                        out.print("B" + "," + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(this.height)+"?");
+                        out.print("B" + a_location.getLatitude() + "," + a_location.getLongitude() + "," + Double.toString(this.height));
                         out.flush();
                     }
                 }
-                out.print("X");
-                out.flush();
             }
             point_no = 0;
         }

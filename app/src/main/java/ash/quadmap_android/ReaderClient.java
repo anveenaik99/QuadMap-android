@@ -5,13 +5,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class ReaderClient extends AsyncTask<Void,Void,BufferedReader> {
 
@@ -34,7 +30,7 @@ public class ReaderClient extends AsyncTask<Void,Void,BufferedReader> {
             // out.println("Chal gaaya");
             // out.flush();
             //bw = new BufferedWriter(out);
-            Log.d("Client", "Successfully Excuted");
+            Log.d("Reader Client", "Successfully Executed");
         }catch (IOException ignored) {
 
         }
