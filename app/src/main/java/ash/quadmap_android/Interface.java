@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -43,6 +44,7 @@ public class Interface extends AppCompatActivity {
     int point_no;
     BufferedReader in;
     String quadGPS = null;
+    Handler quadPos = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,17 +84,7 @@ public class Interface extends AppCompatActivity {
         else
             Toast.makeText(this, "Failed to connect to Server.\n" +
                     "        Try Again !!", Toast.LENGTH_SHORT).show();
-        Thread quad = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    quadGPS = in.readLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        quad.start();
+        quadPos.post(new update(quadPos));
     }
 
     @Override
@@ -225,5 +217,22 @@ public class Interface extends AppCompatActivity {
     String getIn() {
         //Toast.makeText(this, quadGPS, Toast.LENGTH_SHORT).show();
         return quadGPS;
+    }
+
+    class update implements Runnable{
+        final Handler mHandler;
+
+        update(Handler mHandler) {
+            this.mHandler = mHandler;
+        }
+
+        @Override
+        public void run() {
+            mHandler.postDelayed(this,50);
+            try {
+                quadGPS = in.readLine();
+            } catch (IOException ignored) {
+            }
+        }
     }
 }
