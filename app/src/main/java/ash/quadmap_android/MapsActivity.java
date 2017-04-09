@@ -358,9 +358,9 @@ public class MapsActivity extends Fragment implements
             mHandler.postDelayed(this,50);
             String GPS = null;
             GPS = ((Interface) getActivity()).getIn();
-            Log.i("Debug","In Runnable");
+            //Log.i("Debug","In Runnable");
             if (GPS != null) {
-                Log.i("Reader", "GPS Recieved");
+               // Log.i("Reader", "GPS Recieved");
                 String[] latlng = GPS.split(",");
                 LatLng latLng = new LatLng(Double.parseDouble(latlng[0]), Double.parseDouble(latlng[1]));
                 if (lastQuadMark != null)
