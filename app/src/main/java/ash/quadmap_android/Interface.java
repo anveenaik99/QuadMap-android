@@ -88,7 +88,8 @@ public class Interface extends AppCompatActivity {
             public void run() {
                 try {
                     while (true) {
-                        quadGPS = in.readLine();
+                        if(in != null)
+                            quadGPS = in.readLine();
                         Thread.sleep(20);
                     }
                 } catch (IOException e) {
