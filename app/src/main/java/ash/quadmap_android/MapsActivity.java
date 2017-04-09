@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.icu.util.TimeUnit;
 import android.location.Location;
 import android.location.LocationManager;
@@ -107,10 +108,15 @@ public class MapsActivity extends Fragment implements
             public void run() {
                 String GPS = null;
                 BufferedReader in = null;
+                int height = 100;
+                int width = 100;
+                BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.quad);
+                Bitmap b=bitmapdraw.getBitmap();
+                Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
                 //Test Code////////////////////////////////////////////////////////////
                 MarkerOptions op = new MarkerOptions()
                         .position(new LatLng(22.317946,87.3051))
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.quad));
+                        .icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
                         mMap.addMarker(op);
                 ////////////////////////////////////////////////////////////////////////
                 while (mGoogleApiClient.isConnected()) {
@@ -129,7 +135,7 @@ public class MapsActivity extends Fragment implements
                                 lastQuadMark.remove();
                             MarkerOptions options = new MarkerOptions()
                                     .position(latLng)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.quad));
+                                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
                             lastQuadMark = mMap.addMarker(options);
                         }
                     }
