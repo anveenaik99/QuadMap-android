@@ -5,7 +5,7 @@ Simple android app to control Quad over socket connection.
 <img src="https://github.com/ash-anand/QuadMap-android/raw/master/Screenshots/Screenshot_20170409-233557.png" alt="Drawing" width="300"/> 
 <img src="https://github.com/ash-anand/QuadMap-android/raw/master/Screenshots/Screenshot_20170409-233641.png" alt="Drawing" width="300"/>
 
-It uses Google Maps API to retrive GPS poiwidth="300"nts and display markers with quad position.
+It uses Google Maps API to retrive GPS points and display markers with quad position.
 
 ## Modes
 
